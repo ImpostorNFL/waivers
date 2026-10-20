@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a101b" />
+  <meta name="description" content="Jugadores sin equipo en tu liga Sleeper NFL, actualizados desde la API pública." />
+  <title>Waiver Wire · Sleeper NFL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-icon">↗</span><span>SLEEPER<span class="brand-accent">/</span>WIRE</span></div>
+      <a id="leagueLink" class="external" href="https://sleeper.com/leagues/1388976988894543872" target="_blank" rel="noopener noreferrer">Abrir en Sleeper <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="eyebrow"><span class="live-dot"></span> CONECTADO A SLEEPER · NFL</div>
+        <h1>Tu próxima <span>gran incorporación.</span></h1>
+        <p>Explorá los jugadores que no pertenecen a ningún roster de tu liga. Sin login, sin vueltas.</p>
+        <div class="league-strip"><div><span class="label">TU LIGA</span><strong id="leagueName">Cargando liga...</strong></div><div><span class="label">TEMPORADA</span><strong id="season">—</strong></div><div><span class="label">EQUIPOS</span><strong id="teams">—</strong></div><button id="refresh" class="refresh" type="button">↻ Actualizar</button></div>
+      </section>
+
+      <section class="content" aria-labelledby="available-title">
+        <div class="section-heading"><div><span class="overline">EL MERCADO</span><h2 id="available-title">Jugadores disponibles <span id="count" class="count">—</span></h2></div><div class="timestamp" id="updated">Esperando datos</div></div>
+        <div class="toolbar"><label class="search" for="search"><span aria-hidden="true">⌕</span><input id="search" placeholder="Buscar nombre o equipo NFL..." autocomplete="off" aria-label="Buscar jugador" /></label><select id="sort" aria-label="Ordenar jugadores"><option value="popular">Más agregados (24 h)</option><option value="name">Nombre A–Z</option><option value="team">Equipo NFL</option></select></div>
+        <div class="filters" role="group" aria-label="Filtrar posición"><button class="chip active" data-position="ALL" aria-pressed="true">Todos</button><button class="chip" data-position="QB" aria-pressed="false">QB</button><button class="chip" data-position="RB" aria-pressed="false">RB</button><button class="chip" data-position="WR" aria-pressed="false">WR</button><button class="chip" data-position="TE" aria-pressed="false">TE</button><button class="chip" data-position="K" aria-pressed="false">K</button><button class="chip" data-position="DEF" aria-pressed="false">DEF</button></div>
+        <div id="notice" class="notice" role="status" aria-live="polite">Cargando jugadores y rosters de Sleeper...</div>
+        <div class="table-wrap"><table><thead><tr><th>JUGADOR</th><th>POS.</th><th>EQUIPO</th><th>AGREGADOS 24 H</th><th>LESIÓN</th></tr></thead><tbody id="players"><tr><td colspan="5" class="empty">Preparando tu mercado de agentes libres...</td></tr></tbody></table></div>
+        <div class="pagination"><span id="shown">—</span><button id="more" type="button" hidden>Mostrar más ↓</button></div>
+        <p class="footnote">* «Disponible» significa que el jugador no figura en ningún roster de esta liga. Puede estar sujeto a waivers, bloqueos o restricciones de Sleeper; la API pública no confirma si es incorporable en este instante. Las tendencias son globales de Sleeper, no exclusivas de tu liga.</p>
+      </section>
+    </main>
+    <footer><span>Hecho para fantasy NFL · Datos: <a href="https://docs.sleeper.com/" target="_blank" rel="noopener noreferrer">Sleeper API</a></span><span>Esta web no está afiliada a Sleeper.</span></footer>
+  </div>
+</body>
+</html>
