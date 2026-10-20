@@ -86,7 +86,6 @@ async function load() {
       .filter(p => p._position && p.full_name && p.team);
     $('leagueName').textContent = league.name || 'Liga de Sleeper';
     $('season').textContent = league.season || 'Temporada';
-    $('teams').textContent = String(rosters.length);
     $('updated').textContent = `Actualizado ${new Date().toLocaleString('es-AR', { day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit' })}`;
     limit = PAGE_SIZE;
     showNotice('');
