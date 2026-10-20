@@ -6,7 +6,7 @@ const API = 'https://api.sleeper.app/v1';
 const PAGE_SIZE = 50;
 const CACHE_KEY = 'lfa-waivers-players-v1';
 const CACHE_AGE_MS = 24 * 60 * 60 * 1000;
-const POSITIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
+const POSITIONS = ['QB', 'RB', 'WR', 'TE'];
 const $ = (id) => document.getElementById(id);
 let available = [];
 let position = 'ALL';
@@ -36,7 +36,6 @@ function escapeHTML(value) {
 }
 function primaryPosition(player) {
   const all = [player.position, ...(player.fantasy_positions || [])];
-  if (all.includes('DEF')) return 'DEF';
   return POSITIONS.find(p => all.includes(p)) || null;
 }
 function showNotice(text, error = false) {
@@ -84,9 +83,9 @@ async function load() {
     available = Object.entries(players).map(([id, p]) => ({ ...p, player_id: String(p.player_id || id) }))
       .filter(p => !occupied.has(p.player_id))
       .map(p => ({ ...p, _position: primaryPosition(p), _adds: adds.get(p.player_id) || 0 }))
-      .filter(p => p._position && p.full_name && (p.team || p._position === 'DEF'));
+      .filter(p => p._position && p.full_name && p.team);
     $('leagueName').textContent = league.name || 'Liga de Sleeper';
-    $('season').textContent = league.season || '—';
+    $('season').textContent = league.season || 'Temporada';
     $('teams').textContent = String(rosters.length);
     $('updated').textContent = `Actualizado ${new Date().toLocaleString('es-AR', { day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit' })}`;
     limit = PAGE_SIZE;

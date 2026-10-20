@@ -1,13 +1,11 @@
 # LFA · Waivers
 
-Sitio estático y minimalista para consultar los jugadores sin dueño de la liga Sleeper `1388976988894543872`.
+Web estática para ver jugadores sin roster en la liga Sleeper `1388976988894543872`.
 
-## Publicar con GitHub Pages
+## Publicar en GitHub Pages
 
-1. Subí `index.html`, `styles.css`, `app.js` y `lfa-escudo.png` a la **raíz** del repositorio `ImpostorNFL/waivers` (reemplazando los archivos existentes).
-2. En **Settings → Pages** elegí **Deploy from a branch → main → /(root)** y guardá.
-3. Abrí `https://impostornfl.github.io/waivers/` tras la publicación.
+Subir **el contenido de esta carpeta** a la raíz del repositorio `ImpostorNFL/waivers`. En **Settings → Pages**, seleccionar **Deploy from a branch → main → /(root)**.
 
-No necesita login, servidor ni token. Usa la API pública de Sleeper. El catálogo de jugadores se guarda localmente durante 24 horas. La lista excluye a quienes estén en los rosters de la liga, pero no representa con exactitud los bloqueos o tiempos de waiver.
+Archivos: `index.html`, `styles.css`, `app.js`, `lfa-escudo.png` y este README.
 
-El escudo `lfa-escudo.png` es aportado por el propietario de la liga.
+La página no requiere inicio de sesión. Usa la API pública de Sleeper; muestra únicamente QB, RB, WR y TE. Identifica jugadores sin roster, no garantiza disponibilidad inmediata mientras están sujetos a waivers. Las tendencias de 24 horas son globales. El catálogo de jugadores se cachea en el navegador por 24 horas.
