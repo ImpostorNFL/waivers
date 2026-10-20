@@ -9,3 +9,7 @@ Subir **el contenido de esta carpeta** a la raíz del repositorio `ImpostorNFL/w
 Archivos: `index.html`, `styles.css`, `app.js`, `lfa-escudo.png` y este README.
 
 La página no requiere inicio de sesión. Usa la API pública de Sleeper; muestra únicamente QB, RB, WR y TE. Identifica jugadores sin roster, no garantiza disponibilidad inmediata mientras están sujetos a waivers. Las tendencias de 24 horas son globales. El catálogo de jugadores se cachea en el navegador por 24 horas.
+
+## Versión oscura / FLEX
+
+Esta edición utiliza siempre tema oscuro y agrega filtro FLEX (RB + WR + TE). Subir archivos descomprimidos a raíz de `main` y sobrescribir los existentes. Si GitHub Pages aún muestra colores claros, hacer recarga forzada (Ctrl + F5) y esperar el despliegue.

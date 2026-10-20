@@ -46,7 +46,7 @@ function render() {
   const query = $('search').value.trim().toLocaleLowerCase();
   const sort = $('sort').value;
   let rows = available.filter(p =>
-    (position === 'ALL' || p._position === position) &&
+    (position === 'ALL' || (position === 'FLEX' ? ['RB', 'WR', 'TE'].includes(p._position) : p._position === position)) &&
     `${p.full_name || ''} ${p.team || ''} ${p._position}`.toLocaleLowerCase().includes(query)
   );
   rows.sort((a, b) => {

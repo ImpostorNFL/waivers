@@ -7,8 +7,8 @@
   <meta name="description" content="Jugadores disponibles de la liga LFA.">
   <title>LFA | Waivers</title>
   <link rel="icon" href="lfa-escudo.png" type="image/png">
-  <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=4-dark-flex">
+  <script src="app.js?v=4-dark-flex" defer></script>
 </head>
 <body>
   <div class="shell">
@@ -36,7 +36,7 @@
           <label class="search" for="search"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.3 4.3"/></svg><input id="search" placeholder="Buscar jugador o equipo" autocomplete="off" aria-label="Buscar jugador"></label>
           <select id="sort" aria-label="Ordenar jugadores"><option value="popular">Más agregados (24 h)</option><option value="name">Nombre A–Z</option><option value="team">Equipo NFL</option></select>
         </div>
-        <div class="filters" role="group" aria-label="Filtrar por posición"><button class="chip active" data-position="ALL" aria-pressed="true">Todos</button><button class="chip" data-position="QB" aria-pressed="false">QB</button><button class="chip" data-position="RB" aria-pressed="false">RB</button><button class="chip" data-position="WR" aria-pressed="false">WR</button><button class="chip" data-position="TE" aria-pressed="false">TE</button></div>
+        <div class="filters" role="group" aria-label="Filtrar por posición"><button class="chip active" data-position="ALL" aria-pressed="true">Todos</button><button class="chip" data-position="QB" aria-pressed="false">QB</button><button class="chip" data-position="RB" aria-pressed="false">RB</button><button class="chip" data-position="WR" aria-pressed="false">WR</button><button class="chip" data-position="TE" aria-pressed="false">TE</button><button class="chip" data-position="FLEX" aria-pressed="false">FLEX</button></div>
         <div id="notice" class="notice" role="status" aria-live="polite">Buscando jugadores…</div>
         <div class="table-wrap"><table><thead><tr><th>Jugador</th><th>Posición</th><th>Equipo</th><th>Agregados 24 h</th><th>Lesión</th></tr></thead><tbody id="players"><tr><td colspan="5" class="empty">Cargando…</td></tr></tbody></table></div>
         <div class="pagination"><span id="shown">—</span><button id="more" type="button" hidden>Ver más ↓</button></div>

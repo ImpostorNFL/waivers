@@ -24,3 +24,17 @@ td{border-bottom-color:#304655;color:#bfd2dd}tbody tr:hover{background:#233b4b}
 .muted{color:#8da5b3}.empty{color:#9db3c0}
 .pagination{color:#94acba}.pagination button{background:#2a4557;color:#c0e2f0}
 .disclaimer{color:#91a9b8}footer{color:#91a8b8}
+
+/* Tema oscuro permanente: especificidad reforzada para todas las superficies. */
+html,body{background-color:#101b27!important;color:#dbe8ef;color-scheme:dark}
+body .market{background:#192938;border-color:#304553}
+body .table-wrap{background:#192938;border-color:#334957}
+body .header-page{background:#1b2a38;color:#a9c8d8}
+body .chip:not(.active){background:#233747;color:#b4cbd9;border-color:#364f60}
+body .chip.active{background:#447f9a;color:white}
+body .refresh{background:#233849;color:#c2dce9}
+body .search,body .controls select{background:#142330;color:#bcd0dc}
+body thead th{background:#213546;color:#adc5d1}
+body tbody tr{background:#192938}
+body tbody tr:hover{background:#233b4b}
+body tbody td{color:#bfd2dd;border-color:#304655}
