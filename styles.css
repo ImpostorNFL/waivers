@@ -38,3 +38,6 @@ body thead th{background:#213546;color:#adc5d1}
 body tbody tr{background:#192938}
 body tbody tr:hover{background:#233b4b}
 body tbody td{color:#bfd2dd;border-color:#304655}
+
+/* Puntos fantasy: nuevo dato sin alterar el tema oscuro */
+.fantasy-points { color: #a6d6ea; font-weight: 750; font-variant-numeric: tabular-nums; }

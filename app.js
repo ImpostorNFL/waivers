@@ -7,11 +7,14 @@ const PAGE_SIZE = 50;
 const CACHE_KEY = 'lfa-waivers-players-v1';
 const CACHE_AGE_MS = 24 * 60 * 60 * 1000;
 const POSITIONS = ['QB', 'RB', 'WR', 'TE'];
+const STATS_API = 'https://api.sleeper.com/stats/nfl';
 const $ = (id) => document.getElementById(id);
 let available = [];
 let position = 'ALL';
 let limit = PAGE_SIZE;
 let busy = false;
+let statsAvailable = false;
+let scoringLabel = 'PPR';
 
 async function getJSON(path) {
   const response = await fetch(`${API}${path}`, { headers: { Accept: 'application/json' } });
@@ -29,6 +32,24 @@ async function getPlayers() {
   const data = await getJSON('/players/nfl?active=true');
   try { localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data })); } catch (_) { /* Opcional */ }
   return data;
+}
+
+async function getSeasonStats(season) {
+  // Endpoint de estadísticas públicas de Sleeper; distinto del API de rosters.
+  // La API puede no responder o bloquear consultas en algunos navegadores.
+  const response = await fetch(`${STATS_API}/regular/${encodeURIComponent(season)}?season_type=regular`, { headers: { Accept: 'application/json' } });
+  if (!response.ok) throw new Error(`Estadísticas HTTP ${response.status}`);
+  const data = await response.json();
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !Object.keys(data).length) throw new Error('Estadísticas sin datos');
+  return data;
+}
+
+function selectPoints(record, receptionValue) {
+  if (!record || typeof record !== 'object') return null;
+  const values = record.stats && typeof record.stats === 'object' ? record.stats : record;
+  const key = receptionValue === 0 ? 'pts_std' : receptionValue === 0.5 ? 'pts_half_ppr' : 'pts_ppr';
+  const n = Number(values[key]);
+  return values[key] == null || !Number.isFinite(n) ? null : n;
 }
 
 function escapeHTML(value) {
@@ -51,7 +72,7 @@ function render() {
   );
   rows.sort((a, b) => {
     if (sort === 'popular') return (b._adds - a._adds) || a.full_name.localeCompare(b.full_name, 'es');
-    if (sort === 'team') return (a.team || 'ZZZ').localeCompare(b.team || 'ZZZ') || a.full_name.localeCompare(b.full_name, 'es');
+    if (sort === 'points') return (b._points ?? -Infinity) - (a._points ?? -Infinity) || a.full_name.localeCompare(b.full_name, 'es');
     return a.full_name.localeCompare(b.full_name, 'es');
   });
   $('count').textContent = rows.length.toLocaleString('es-AR');
@@ -61,8 +82,8 @@ function render() {
   $('players').innerHTML = shown.length ? shown.map(p => {
     const id = encodeURIComponent(p.player_id);
     const fallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="#e9f1f4"/><text x="24" y="32" fill="#587f96" font-size="20" text-anchor="middle">?</text></svg>');
-    return `<tr><td><div class="player"><img class="avatar" src="https://sleepercdn.com/content/nfl/players/${id}.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"><div class="person"><strong>${escapeHTML(p.full_name)}</strong><small>${escapeHTML(p.college || 'NFL')}</small></div></div></td><td><span class="pos">${p._position}</span></td><td>${escapeHTML(p.team || 'FA')}</td><td>${p._adds ? `<span class="trend">↗ ${p._adds.toLocaleString('es-AR')}</span>` : '<span class="muted">—</span>'}</td><td>${p.injury_status ? `<span class="injury">${escapeHTML(p.injury_status)}</span>` : '<span class="muted">—</span>'}</td></tr>`;
-  }).join('') : `<tr><td colspan="5" class="empty">No encontramos jugadores con esos filtros.</td></tr>`;
+    return `<tr><td><div class="player"><img class="avatar" src="https://sleepercdn.com/content/nfl/players/${id}.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"><div class="person"><strong>${escapeHTML(p.full_name)}</strong><small>${escapeHTML(p.college || 'NFL')}</small></div></div></td><td><span class="pos">${p._position}</span></td><td>${escapeHTML(p.team || 'FA')}</td><td>${p._points == null ? '<span class="muted">—</span>' : `<strong class="fantasy-points">${p._points.toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:2})}</strong>`}</td><td>${p._adds ? `<span class="trend">↗ ${p._adds.toLocaleString('es-AR')}</span>` : '<span class="muted">—</span>'}</td><td>${p.injury_status ? `<span class="injury">${escapeHTML(p.injury_status)}</span>` : '<span class="muted">—</span>'}</td></tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty">No encontramos jugadores con esos filtros.</td></tr>`;
 }
 
 async function load() {
@@ -78,21 +99,34 @@ async function load() {
       getJSON('/players/nfl/trending/add?lookback_hours=24&limit=200').catch(() => [])
     ]);
     if (!league || !Array.isArray(rosters) || !players || typeof players !== 'object') throw new Error('No se pudo interpretar la información de la liga.');
-    const occupied = new Set(rosters.flatMap(r => r.players || []).map(String));
+    const season = String(league.season || '2026');
+    const receptionValue = Number(league.scoring_settings?.rec ?? 1);
+    scoringLabel = receptionValue === 0 ? 'Standard' : receptionValue === 0.5 ? 'Half PPR' : 'PPR';
+    $('pointsHeading').textContent = `Pts. fantasy ${season}`;
+    $('pointsHeading').title = `Puntos reales acumulados (${scoringLabel}). Si tu liga tiene bonificaciones especiales, pueden diferir de los puntos exactos de Sleeper.`;
+    let stats = {};
+    try {
+      stats = await getSeasonStats(season);
+      statsAvailable = true;
+    } catch (error) {
+      statsAvailable = false;
+      console.warn('Las estadísticas de fantasy no están disponibles:', error);
+    }
+    const occupied = new Set(rosters.flatMap(r => [...(r.players || []), ...(r.taxi || []), ...(r.reserve || [])]).map(String));
     const adds = new Map((Array.isArray(trending) ? trending : []).map(p => [String(p.player_id), Number(p.count) || 0]));
     available = Object.entries(players).map(([id, p]) => ({ ...p, player_id: String(p.player_id || id) }))
       .filter(p => !occupied.has(p.player_id))
-      .map(p => ({ ...p, _position: primaryPosition(p), _adds: adds.get(p.player_id) || 0 }))
+      .map(p => ({ ...p, _position: primaryPosition(p), _adds: adds.get(p.player_id) || 0, _points: selectPoints(stats[p.player_id], receptionValue) }))
       .filter(p => p._position && p.full_name && p.team);
     $('leagueName').textContent = league.name || 'Liga de Sleeper';
     $('season').textContent = league.season || 'Temporada';
     $('updated').textContent = `Actualizado ${new Date().toLocaleString('es-AR', { day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit' })}`;
     limit = PAGE_SIZE;
-    showNotice('');
+    showNotice(statsAvailable ? '' : 'No se pudieron consultar los puntos fantasy en este momento. Los jugadores y el resto de los datos siguen disponibles.');
     render();
   } catch (error) {
     showNotice(`No se pudieron cargar los datos. ${error.message}. Verificá la conexión e intentá «Actualizar».`, true);
-    $('players').innerHTML = '<tr><td colspan="5" class="empty">No se pudo establecer conexión con la API de Sleeper.</td></tr>';
+    $('players').innerHTML = '<tr><td colspan="6" class="empty">No se pudo establecer conexión con la API de Sleeper.</td></tr>';
     $('shown').textContent = 'Sin datos';
     $('count').textContent = '—';
     $('more').hidden = true;

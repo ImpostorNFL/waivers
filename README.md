@@ -13,3 +13,6 @@ La página no requiere inicio de sesión. Usa la API pública de Sleeper; muestr
 ## Versión oscura / FLEX
 
 Esta edición utiliza siempre tema oscuro y agrega filtro FLEX (RB + WR + TE). Subir archivos descomprimidos a raíz de `main` y sobrescribir los existentes. Si GitHub Pages aún muestra colores claros, hacer recarga forzada (Ctrl + F5) y esperar el despliegue.
+
+## Puntos fantasy
+Se consultan las estadísticas reales acumuladas de la temporada de Sleeper y se utiliza la modalidad Standard, Half PPR o PPR según el valor de recepciones de la liga. Las bonificaciones personalizadas pueden hacer que los puntos difieran. La API de estadísticas puede no estar disponible desde ciertos navegadores; en ese caso aparece «—», nunca un valor inventado.
