@@ -4,7 +4,7 @@
 const LEAGUE_ID = '1388976988894543872';
 const API = 'https://api.sleeper.app/v1';
 const PAGE_SIZE = 50;
-const CACHE_KEY = 'sleeper-wire-players-v2';
+const CACHE_KEY = 'lfa-waivers-players-v1';
 const CACHE_AGE_MS = 24 * 60 * 60 * 1000;
 const POSITIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
 const $ = (id) => document.getElementById(id);
@@ -61,7 +61,7 @@ function render() {
   const shown = rows.slice(0, limit);
   $('players').innerHTML = shown.length ? shown.map(p => {
     const id = encodeURIComponent(p.player_id);
-    const fallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="#263248"/><text x="24" y="32" fill="#b4f548" font-size="20" text-anchor="middle">?</text></svg>');
+    const fallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="#e9f1f4"/><text x="24" y="32" fill="#587f96" font-size="20" text-anchor="middle">?</text></svg>');
     return `<tr><td><div class="player"><img class="avatar" src="https://sleepercdn.com/content/nfl/players/${id}.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"><div class="person"><strong>${escapeHTML(p.full_name)}</strong><small>${escapeHTML(p.college || 'NFL')}</small></div></div></td><td><span class="pos">${p._position}</span></td><td>${escapeHTML(p.team || 'FA')}</td><td>${p._adds ? `<span class="trend">↗ ${p._adds.toLocaleString('es-AR')}</span>` : '<span class="muted">—</span>'}</td><td>${p.injury_status ? `<span class="injury">${escapeHTML(p.injury_status)}</span>` : '<span class="muted">—</span>'}</td></tr>`;
   }).join('') : `<tr><td colspan="5" class="empty">No encontramos jugadores con esos filtros.</td></tr>`;
 }
