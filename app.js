@@ -35,13 +35,22 @@ async function getPlayers() {
 }
 
 async function getSeasonStats(season) {
-  // Endpoint de estadísticas públicas de Sleeper; distinto del API de rosters.
-  // La API puede no responder o bloquear consultas en algunos navegadores.
-  const response = await fetch(`${STATS_API}/regular/${encodeURIComponent(season)}?season_type=regular`, { headers: { Accept: 'application/json' } });
+  // Endpoint de temporada de Sleeper: /stats/nfl/{season}?season_type=regular.
+  // La respuesta puede ser un diccionario por player_id o un listado de objetos.
+  const url = `${STATS_API}/${encodeURIComponent(season)}?season_type=regular`;
+  const response = await fetch(url, { headers: { Accept: 'application/json' } });
   if (!response.ok) throw new Error(`Estadísticas HTTP ${response.status}`);
   const data = await response.json();
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !Object.keys(data).length) throw new Error('Estadísticas sin datos');
-  return data;
+  if (!data || typeof data !== 'object') throw new Error('Estadísticas sin datos');
+  const records = Array.isArray(data) ? data : Object.entries(data).map(([id, row]) => ({ ...row, player_id: row?.player_id ?? id }));
+  const byId = {};
+  for (const row of records) {
+    if (!row || typeof row !== 'object') continue;
+    const id = row.player_id || row.player?.player_id || row.player?.id;
+    if (id != null) byId[String(id)] = row;
+  }
+  if (!Object.keys(byId).length) throw new Error('Estadísticas sin jugadores');
+  return byId;
 }
 
 function selectPoints(record, receptionValue) {
@@ -72,7 +81,12 @@ function render() {
   );
   rows.sort((a, b) => {
     if (sort === 'popular') return (b._adds - a._adds) || a.full_name.localeCompare(b.full_name, 'es');
-    if (sort === 'points') return (b._points ?? -Infinity) - (a._points ?? -Infinity) || a.full_name.localeCompare(b.full_name, 'es');
+    if (sort === 'points') {
+      if (a._points == null && b._points == null) return a.full_name.localeCompare(b.full_name, 'es');
+      if (a._points == null) return 1;
+      if (b._points == null) return -1;
+      return b._points - a._points || a.full_name.localeCompare(b.full_name, 'es');
+    }
     return a.full_name.localeCompare(b.full_name, 'es');
   });
   $('count').textContent = rows.length.toLocaleString('es-AR');
@@ -122,7 +136,15 @@ async function load() {
     $('season').textContent = league.season || 'Temporada';
     $('updated').textContent = `Actualizado ${new Date().toLocaleString('es-AR', { day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit' })}`;
     limit = PAGE_SIZE;
-    showNotice(statsAvailable ? '' : 'No se pudieron consultar los puntos fantasy en este momento. Los jugadores y el resto de los datos siguen disponibles.');
+    const pointsCount = available.filter(p => p._points !== null).length;
+    const pointsOption = $('sort').querySelector('option[value="points"]');
+    // Evita indicar falsamente que se está ordenando por puntos si no hay ninguno.
+    pointsOption.disabled = pointsCount === 0;
+    if (pointsCount === 0 && $('sort').value === 'points') $('sort').value = 'popular';
+    const pointsMessage = pointsCount === 0
+      ? 'No hay puntos fantasy disponibles desde la API de Sleeper. Se desactivó el orden por puntos para evitar un orden alfabético engañoso.'
+      : !statsAvailable ? 'Estadísticas parciales disponibles.' : '';
+    showNotice(pointsMessage);
     render();
   } catch (error) {
     showNotice(`No se pudieron cargar los datos. ${error.message}. Verificá la conexión e intentá «Actualizar».`, true);
